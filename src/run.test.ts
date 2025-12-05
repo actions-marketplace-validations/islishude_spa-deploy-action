@@ -1,5 +1,5 @@
-import { run } from './run'
-import * as CacheControl from './cache-control'
+import * as CacheControl from './cache-control.js'
+import { run } from './run.js'
 
 import * as s3 from '@aws-sdk/client-s3'
 import fs from 'node:fs/promises'
@@ -43,6 +43,7 @@ describe('chore', () => {
         dirPath,
         isDelete: true,
         cacheControlJson: { 'index.html': 'no-cache' },
+        cacheControlMergePolicy: 'upsert',
         defaultCacheControl: 'no-cache'
       })
 
@@ -53,7 +54,7 @@ describe('chore', () => {
           CacheControl.optimizedPolicy
         ],
         'js/index.js': [
-          'application/javascript; charset=utf-8',
+          'text/javascript; charset=utf-8',
           CacheControl.optimizedPolicy
         ],
         'index.html': ['text/html; charset=utf-8', 'no-cache']
@@ -61,9 +62,8 @@ describe('chore', () => {
 
       const s3files = await client
         .send(new s3.ListObjectsV2Command({ Bucket: bucket, Prefix: prefix }))
-        .then(
-          v =>
-            v.Contents?.map(f => path.relative(prefix, f.Key as string)).sort()
+        .then(v =>
+          v.Contents?.map(f => path.relative(prefix, f.Key as string)).sort()
         )
       expect(Object.keys(checks).sort()).toEqual(s3files)
 
@@ -92,6 +92,7 @@ describe('chore', () => {
         dirPath,
         isDelete: true,
         cacheControlJson: {},
+        cacheControlMergePolicy: 'upsert',
         defaultCacheControl: 'no-cache'
       })
 
@@ -99,7 +100,7 @@ describe('chore', () => {
         'favicon.ico': ['image/vnd.microsoft.icon', CacheControl.defaultPolicy],
         'index.css': ['text/css; charset=utf-8', CacheControl.optimizedPolicy],
         'index.js': [
-          'application/javascript; charset=utf-8',
+          'text/javascript; charset=utf-8',
           CacheControl.optimizedPolicy
         ],
         'index.html': [
@@ -111,9 +112,8 @@ describe('chore', () => {
 
       const s3files = await client
         .send(new s3.ListObjectsV2Command({ Bucket: bucket, Prefix: prefix }))
-        .then(
-          v =>
-            v.Contents?.map(f => path.relative(prefix, f.Key as string)).sort()
+        .then(v =>
+          v.Contents?.map(f => path.relative(prefix, f.Key as string)).sort()
         )
       expect(Object.keys(checks).sort()).toEqual(s3files)
 

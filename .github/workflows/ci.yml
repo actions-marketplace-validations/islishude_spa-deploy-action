@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - 'releases/*'
 
 jobs:
   test-typescript:
@@ -21,13 +20,13 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         id: setup-node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Install Dependencies
@@ -45,3 +44,6 @@ jobs:
       - name: Test
         id: npm-ci-test
         run: npm run ci-test
+        env:
+          NODE_OPTIONS: --experimental-vm-modules
+          NODE_NO_WARNINGS: 1

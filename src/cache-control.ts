@@ -12,6 +12,8 @@ export const optimizedPolicy = 'public,max-age=31536000,immutable'
 export const indexHtmlPolicy =
   'public,max-age=60,stale-while-revalidate=2592000'
 
+export type MergePolicy = 'upsert' | 'replace'
+
 export const builtin: Map<string, string> = new Map(
   Object.entries({
     'index.html': indexHtmlPolicy,
@@ -19,12 +21,13 @@ export const builtin: Map<string, string> = new Map(
     '*.js': optimizedPolicy,
     '*.png': defaultPolicy,
     '*.jpg': defaultPolicy,
-    '*.ico': defaultPolicy
+    '*.ico': defaultPolicy,
+    '*.svg': defaultPolicy
   })
 )
 
-export function Merge(i: Pattern): Map<string, string> {
-  const merged = new Map(builtin)
+export function Merge(i: Pattern, policy: MergePolicy): Map<string, string> {
+  const merged = policy === 'upsert' ? new Map(builtin) : new Map()
   for (const [key, value] of Object.entries(i)) {
     merged.set(key, value)
   }

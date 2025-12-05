@@ -1,21 +1,19 @@
-import * as CacheControl from './cache-control'
+import * as CacheControl from './cache-control.js'
 
 describe('cache-control', () => {
-  it('merge', () => {
-    const merged = CacheControl.Merge({ 'index.html': 'no-cache' })
+  it('merge:upsert', () => {
+    const merged = CacheControl.Merge({ 'index.html': 'no-cache' }, 'upsert')
 
-    expect(merged).toEqual(
-      new Map(
-        Object.entries({
-          'index.html': 'no-cache',
-          '*.css': CacheControl.optimizedPolicy,
-          '*.js': CacheControl.optimizedPolicy,
-          '*.png': CacheControl.defaultPolicy,
-          '*.jpg': CacheControl.defaultPolicy,
-          '*.ico': CacheControl.defaultPolicy
-        })
-      )
-    )
+    const expected = new Map(CacheControl.builtin)
+    expected.set('index.html', 'no-cache')
+    expect(merged).toEqual(expected)
+  })
+
+  it('merge:replace', () => {
+    const merged = CacheControl.Merge({ 'index.html': 'no-cache' }, 'replace')
+
+    const expected = new Map([['index.html', 'no-cache']])
+    expect(merged).toEqual(expected)
   })
 
   it('get', () => {
