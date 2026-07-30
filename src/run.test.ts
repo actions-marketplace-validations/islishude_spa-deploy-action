@@ -6,6 +6,8 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { Readable } from 'node:stream'
 
+import { beforeAll, describe, expect, it } from 'vitest'
+
 async function streamToString(reader: Readable): Promise<string> {
   const chunks = []
   for await (const chunk of reader) {
@@ -25,8 +27,13 @@ describe('chore', () => {
   })
 
   it('run', async () => {
+    const endpoint = process.env.LOCAL_STACK_ENDPOINT
+    if (!endpoint) {
+      throw new Error('LOCAL_STACK_ENDPOINT is required')
+    }
+
     const client = new s3.S3Client({
-      endpoint: process.env.LOCAL_STACK_ENDPOINT
+      endpoint
     })
 
     const bucket = `bucket-${Math.floor(Math.random() * 100).toString()}`
